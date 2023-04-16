@@ -65,10 +65,11 @@ const generateImages = async (req, res) => {
 };
 
 const generateText = async (req, res) => {
-  const queryString = req.params.queryString;
+  const queryString = req.query.text;
+  console.log(queryString)
   const response = await openai.createCompletion({
     model: "text-davinci-003",
-    prompt: "give me a text to generate a realistic image using dalle 2",
+    prompt: queryString,
     max_tokens: 100,
    });
   console.log(response);
