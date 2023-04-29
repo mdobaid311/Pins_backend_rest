@@ -43,14 +43,13 @@ const uploadImage = async (url) => {
 };
 
 const generateImages = async (req, res) => {
-  console.log("generateImages");
-  const queryString = req.params.queryString;
+   const queryString = req.body.queryString;
   const images = await openai.createImage({
     prompt: queryString,
     n: 2,
     size: "1024x1024",
   });
-
+console.log(queryString)
   download(images.data.data[0].url, "tmp/test.png", async function () {
     console.log("download callback");
 
@@ -65,15 +64,15 @@ const generateImages = async (req, res) => {
 };
 
 const generateText = async (req, res) => {
-  const queryString = req.query.text;
-  console.log(queryString)
+ 
   const response = await openai.createCompletion({
     model: "text-davinci-003",
-    prompt: queryString,
+    prompt:
+      "can you tell me a text to generate a realistic image using dall e 2",
     max_tokens: 100,
-   });
+  });
   console.log(response);
-  res.status(201).json((response.data.choices[0].text).trim());
+  res.status(201).json(response.data.choices[0].text.trim());
 };
 
 module.exports = { generateImages, generateText };
