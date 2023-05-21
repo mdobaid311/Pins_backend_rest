@@ -43,13 +43,13 @@ const uploadImage = async (url) => {
 };
 
 const generateImages = async (req, res) => {
-   const queryString = req.body.queryString;
+  const queryString = req.params.queryString;
   const images = await openai.createImage({
     prompt: queryString,
-    n: 2,
-    size: "1024x1024",
+    n: 1,
+    size: "512x512",
   });
-console.log(queryString)
+  console.log(queryString);
   download(images.data.data[0].url, "tmp/test.png", async function () {
     console.log("download callback");
 
@@ -57,14 +57,13 @@ console.log(queryString)
       path.join(path.dirname(require.main.filename), "/tmp/test.png")
     );
 
-    res.status(200).json(data);
+    res.status(200).json(data); 
   });
 
   // res.status(201).json("url");
 };
 
 const generateText = async (req, res) => {
- 
   const response = await openai.createCompletion({
     model: "text-davinci-003",
     prompt:
