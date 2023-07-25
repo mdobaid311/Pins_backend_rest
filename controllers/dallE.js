@@ -5,7 +5,7 @@ const request = require("request");
 var path = require("path");
 
 const configuration = new Configuration({
-  apiKey: "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",
+  apiKey: "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",
 });
 const openai = new OpenAIApi(configuration);
 
@@ -57,7 +57,7 @@ const generateImages = async (req, res) => {
       path.join(path.dirname(require.main.filename), "/tmp/test.png")
     );
 
-    res.status(200).json(data); 
+    res.status(200).json(data);
   });
 
   // res.status(201).json("url");
