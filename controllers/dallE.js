@@ -9,17 +9,6 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-var download = function (uri, filename, callback) {
-  console.log("download  ");
-
-  request.head(uri, function (err, res, body) {
-    console.log("content-type:", res.headers["content-type"]);
-    console.log("content-length:", res.headers["content-length"]);
-
-    request(uri).pipe(fs.createWriteStream(filename)).on("close", callback);
-  });
-};
-
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
@@ -42,6 +31,17 @@ const uploadImage = async (url) => {
   };
 };
 
+var download = function (uri, filename, callback) {
+  console.log("download  ");
+
+  request.head(uri, function (err, res, body) {
+    console.log("content-type:", res.headers["content-type"]);
+    console.log("content-length:", res.headers["content-length"]);
+
+    request(uri).pipe(fs.createWriteStream(filename)).on("close", callback);
+  });
+};
+
 const generateImages = async (req, res) => {
   const queryString = req.params.queryString;
   const images = await openai.createImage({
@@ -50,17 +50,23 @@ const generateImages = async (req, res) => {
     size: "512x512",
   });
   console.log(queryString);
-  download(images.data.data[0].url, "tmp/test.png", async function () {
-    console.log("download callback");
 
-    const data = await uploadImage(
-      path.join(path.dirname(require.main.filename), "/tmp/test.png")
-    );
+  const imageUri = images.data.data[0].url;
 
-    res.status(200).json(data);
-  });
-
-  // res.status(201).json("url");
+  // Upload the image directly to Cloudinary
+  cloudinary.uploader.upload(
+    imageUri,
+    { folder: "skai", use_filename: true },
+    async (error, result) => {
+      if (error) {
+        console.error("Error uploading image to Cloudinary:", error);
+        res.status(500).json({ error: "Error uploading image" });
+      } else {
+        console.log("Image uploaded successfully");
+        res.status(200).json(result);
+      }
+    }
+  );
 };
 
 const generateText = async (req, res) => {
